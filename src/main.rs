@@ -1,7 +1,7 @@
 mod app;
 mod utils;
 use log::{debug, error, info, trace, warn};
-use std::io;
+use std::{io, sync::mpsc};
 use tui::backend::CrosstermBackend;
 use tui::layout::{Constraint, Direction, Layout};
 use tui::widgets::{Block, Borders, Widget};
@@ -32,6 +32,8 @@ fn main() -> Result<(), io::Error> {
     let backend = CrosstermBackend::new(stdout);
     let mut terminal = Terminal::new(backend)?;
     info!("Created Terminal!");
+
+    let (tx, rx) = mpsc::channel();
 
     let mut md_app = app::App::new("MangaDex TUI");
 
