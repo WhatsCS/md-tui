@@ -3,4 +3,5 @@ target/
 **/*.rs.bk
 *.pdb
 *.png
+*.jpg
 *.log
