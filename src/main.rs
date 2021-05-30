@@ -1,5 +1,7 @@
 mod app;
+mod ui;
 mod utils;
+
 use crossterm::{
     event::{self, DisableMouseCapture, EnableMouseCapture, Event as CEvent, KeyCode},
     execute,
@@ -17,6 +19,7 @@ use tui::backend::CrosstermBackend;
 use tui::layout::{Constraint, Direction, Layout};
 use tui::widgets::{Block, Borders, Widget};
 use tui::Terminal;
+use crossterm::event::KeyModifiers;
 
 enum Event<I> {
     Input(I),
@@ -54,6 +57,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let (tx, rx) = mpsc::channel();
     let tick_rate = Duration::from_millis(250);
     thread::spawn(move || {
+        info!("Spawning event thread");
         let mut last_tick = Instant::now();
         loop {
             let timeout = tick_rate
@@ -72,19 +76,21 @@ fn main() -> Result<(), Box<dyn Error>> {
     terminal.clear()?;
 
     loop {
-        terminal.draw(|f| md_app.draw(f))?;
+        terminal.draw(|f| ui::draw(f, &mut md_app))?;
         match rx.recv()? {
             Event::Input(event) => match event.code {
                 KeyCode::Char('q') => {
-                    disable_raw_mode()?;
-                    md_app.quit();
-                    execute!(
-                        terminal.backend_mut(),
-                        DisableMouseCapture,
-                        LeaveAlternateScreen,
-                    )?;
-                    terminal.show_cursor()?;
-                    break;
+                    if event.modifiers == KeyModifiers::CONTROL {
+                        disable_raw_mode()?;
+                        md_app.quit();
+                        execute!(
+                            terminal.backend_mut(),
+                            DisableMouseCapture,
+                            LeaveAlternateScreen,
+                        )?;
+                        terminal.show_cursor()?;
+                        break;
+                    }
                 }
                 KeyCode::Char('a') => md_app.prev_tab(),
                 KeyCode::Char('d') => md_app.next_tab(),
