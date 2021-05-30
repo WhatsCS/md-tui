@@ -24,27 +24,6 @@ impl<'a> App<'a> {
         }
     }
 
-    pub fn draw<B: Backend>(&mut self, f: &mut Frame<B>) {
-        let chunks = Layout::default()
-            .constraints([
-                Constraint::Percentage(25),
-                Constraint::Percentage(50),
-                Constraint::Percentage(25),
-            ])
-            .split(f.size());
-        let titles = self
-            .tabs
-            .titles
-            .iter()
-            .map(|t| Spans::from(Span::styled(*t, Style::default().fg(Color::Green))))
-            .collect();
-        let tabs = Tabs::new(titles)
-            .block(Block::default().borders(Borders::ALL).title(self.title))
-            .highlight_style(Style::default().fg(Color::Yellow))
-            .select(self.tabs.index);
-        f.render_widget(tabs, chunks[0]);
-    }
-
     pub fn next_tab(&mut self) {
         self.tabs.next();
     }
@@ -55,5 +34,19 @@ impl<'a> App<'a> {
 
     pub fn quit(&mut self) {
         self.quit = true;
+    }
+
+    pub fn add_tab_series(&mut self) {
+        // TODO: get series name and use that instead
+        self.tabs.add("Series");
+    }
+
+    pub fn add_tab_chapter(&mut self) {
+        // TODO: get chapter name and use that
+        self.tabs.add("Chapter");
+    }
+
+    pub fn remove_tab(&mut self) {
+        self.tabs.remove()
     }
 }
