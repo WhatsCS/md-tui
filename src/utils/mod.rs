@@ -22,7 +22,8 @@ impl<'a> TabList<'a> {
     pub fn add(&mut self, new_tab: &'a str) {
         self.titles.push(new_tab);
     }
-    pub fn remove(&mut self, old_tab: &'a str) {
+    // TODO: old_tab: &'a str
+    pub fn remove(&mut self) {
         if self.index < 2 {
             return;
         }
