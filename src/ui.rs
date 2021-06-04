@@ -2,7 +2,7 @@ use crate::app::App;
 use tui::backend::Backend;
 use tui::layout::{Constraint, Layout, Rect};
 use tui::style::{Color, Style};
-use tui::text::{Spans, Span};
+use tui::text::{Span, Spans};
 use tui::widgets::{Block, Borders, Tabs};
 use tui::Frame;
 

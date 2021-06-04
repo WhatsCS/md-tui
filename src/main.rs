@@ -2,6 +2,7 @@ mod app;
 mod ui;
 mod utils;
 
+use crossterm::event::KeyModifiers;
 use crossterm::{
     event::{self, DisableMouseCapture, EnableMouseCapture, Event as CEvent, KeyCode},
     execute,
@@ -19,7 +20,6 @@ use tui::backend::CrosstermBackend;
 use tui::layout::{Constraint, Direction, Layout};
 use tui::widgets::{Block, Borders, Widget};
 use tui::Terminal;
-use crossterm::event::KeyModifiers;
 
 enum Event<I> {
     Input(I),
