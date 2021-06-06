@@ -28,12 +28,59 @@ pub fn draw<B: Backend>(f: &mut Frame<B>, app: &mut App) {
         3 => draw_chapter_tab(f, app, chunks[1]),
         _ => {}
     };
+fn draw_search_bar<B>(f: &mut Frame<B>, app: &mut App, area: Rect)
+where
+    B: Backend,
+{
+    // Draw the input box
+    let chunks = Layout::default()
+        .direction(Direction::Vertical)
+        .margin(2)
+        .constraints(
+            [
+                Constraint::Length(3),
+            ]
+            .as_ref(),
+        )
+        .split(f.size());
+
+    let search = Paragraph::new(app.input.as_ref())
+        .style(match app.input_mode {
+            InputMode::Normal => Style::default(),
+            InputMode::Editing => Style::default().fg(Color::Green),
+        })
+        .block(Block::default().borders(Borders::ALL).title("Search Manga"));
+    f.render_widget(search, chunks[0]);
+    match app.input_mode {
+        // if normal hide cursor (does it by default)
+        InputMode::Normal => {}
+        InputMode::Editing => {
+            // we are editing so time to show the cursor
+            f.set_cursor(
+                // we need to manually manage cursor position lmao
+                chunks[0].x + app.input.len() as u16 + 1,
+                chunks[0].y + 1,
+            )
+        }
+    }
+}
 }
 
 fn draw_search_tab<B>(f: &mut Frame<B>, app: &mut App, area: Rect)
 where
     B: Backend,
 {
+    let chunks = Layout::default()
+        .constraints(
+            [
+                Constraint::Length(9),
+                Constraint::Min(8),
+                Constraint::Length(7),
+            ]
+            .as_ref(),
+        )
+        .split(area);
+    draw_search_bar(f, app, chunks[0]);
 }
 
 fn draw_follows_tab<B>(f: &mut Frame<B>, app: &mut App, area: Rect)
