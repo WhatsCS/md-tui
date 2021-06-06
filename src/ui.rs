@@ -1,9 +1,9 @@
-use crate::app::App;
+use crate::app::{App, InputMode};
 use tui::backend::Backend;
-use tui::layout::{Constraint, Layout, Rect};
+use tui::layout::{Constraint, Direction, Layout, Rect};
 use tui::style::{Color, Style};
 use tui::text::{Span, Spans};
-use tui::widgets::{Block, Borders, Tabs};
+use tui::widgets::{Block, Borders, Clear, Paragraph, Tabs};
 use tui::Frame;
 
 pub fn draw<B: Backend>(f: &mut Frame<B>, app: &mut App) {

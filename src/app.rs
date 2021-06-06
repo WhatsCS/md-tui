@@ -1,4 +1,5 @@
 use crate::utils::TabList;
+#[allow(unused_imports)]
 use tui::{
     backend::Backend,
     layout::{Constraint, Layout},
@@ -8,10 +9,18 @@ use tui::{
     Frame,
 };
 
+#[derive(PartialEq)]
+pub enum InputMode {
+    Normal,
+    Editing,
+}
+
 pub struct App<'a> {
     pub title: &'a str,
     pub quit: bool,
     pub tabs: TabList<'a>,
+    pub input_mode: InputMode,
+    pub input: String,
 }
 
 impl<'a> App<'a> {
@@ -21,6 +30,8 @@ impl<'a> App<'a> {
             title,
             quit: false,
             tabs: TabList::new(vec!["Search", "Follows"]),
+            input_mode: InputMode::Normal,
+            input: String::new(),
         }
     }
 

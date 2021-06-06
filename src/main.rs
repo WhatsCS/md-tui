@@ -3,10 +3,13 @@ mod ui;
 mod utils;
 
 use crossterm::{
-    event::{self, DisableMouseCapture, EnableMouseCapture, Event as CEvent, KeyCode, KeyModifiers},
+    event::{
+        self, DisableMouseCapture, EnableMouseCapture, Event as CEvent, KeyCode, KeyModifiers,
+    },
     execute,
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
 };
+#[allow(unused_imports)]
 use log::{debug, error, info, trace, warn};
 use std::{
     error::Error,
@@ -16,7 +19,9 @@ use std::{
     time::{Duration, Instant},
 };
 use tui::backend::CrosstermBackend;
+#[allow(unused_imports)]
 use tui::layout::{Constraint, Direction, Layout};
+#[allow(unused_imports)]
 use tui::widgets::{Block, Borders, Widget};
 use tui::Terminal;
 
@@ -57,7 +62,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let tick_rate = Duration::from_millis(250);
     thread::spawn(move || {
         info!("Spawning event thread");
-        let mut last_tick = Instant::now();
+        let last_tick = Instant::now();
         loop {
             let timeout = tick_rate
                 .checked_sub(last_tick.elapsed())
@@ -77,27 +82,44 @@ fn main() -> Result<(), Box<dyn Error>> {
     loop {
         terminal.draw(|f| ui::draw(f, &mut md_app))?;
         match rx.recv()? {
-            Event::Input(event) => match event.code {
-                KeyCode::Char('q') => {
-                    if event.modifiers == KeyModifiers::CONTROL {
-                        disable_raw_mode()?;
-                        md_app.quit();
-                        execute!(
-                            terminal.backend_mut(),
-                            DisableMouseCapture,
-                            LeaveAlternateScreen,
-                        )?;
-                        terminal.show_cursor()?;
-                        break;
+            Event::Input(event) => {
+                if md_app.input_mode == app::InputMode::Normal {
+                    match event.code {
+                        KeyCode::Char('q') => {
+                            if event.modifiers == KeyModifiers::CONTROL {
+                                disable_raw_mode()?;
+                                md_app.quit();
+                                execute!(
+                                    terminal.backend_mut(),
+                                    DisableMouseCapture,
+                                    LeaveAlternateScreen,
+                                )?;
+                                terminal.show_cursor()?;
+                                break;
+                            }
+                        }
+                        KeyCode::Char('a') => md_app.prev_tab(),
+                        KeyCode::Char('d') => md_app.next_tab(),
+                        KeyCode::Char('i') => md_app.input_mode = app::InputMode::Editing,
+                        _ => {}
+                    }
+                } else {
+                    match event.code {
+                        KeyCode::Char(c) => {
+                            md_app.input.push(c);
+                        }
+                        KeyCode::Backspace => {
+                            md_app.input.pop();
+                        }
+                        KeyCode::Esc => {
+                            md_app.input_mode = app::InputMode::Normal;
+                        }
+                        _ => {}
                     }
                 }
-                KeyCode::Char('a') => md_app.prev_tab(),
-                KeyCode::Char('d') => md_app.next_tab(),
-                _ => {}
-            },
+            }
             _ => {}
         }
-
         if md_app.quit {
             break;
         }
