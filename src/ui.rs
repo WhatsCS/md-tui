@@ -35,7 +35,7 @@ where
     // Draw the input box
     let chunks = Layout::default()
         .direction(Direction::Vertical)
-        .margin(2)
+        .vertical_margin(3)
         .constraints(
             [
                 Constraint::Length(3),
